@@ -3,11 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# تجاهل الكاش اللي بره مجلد src
-../__pycache__/
-../routes/__pycache__/
-../*.pyc
-
 # C extensions
 *.so
 
