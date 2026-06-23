@@ -40,12 +40,4 @@ class ProjectModel(BaseDataModel):
             total_pages +=1
 
         self.collection.find().skip( (page-1) * page_size ).limit(page_size)
-
-
         
-    
-    
-    
-
-
-
