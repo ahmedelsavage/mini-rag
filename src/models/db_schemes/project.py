@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
-from bson.objectid import ObjectId
+from bson.objectid import ObjectId 
 
 class Project(BaseModel):
     _id: Optional[ObjectId]
@@ -14,7 +14,7 @@ class Project(BaseModel):
 
         return value
     
-    class Config:
+    #class Config:
         arbitrary_types_allowed = True
 
-    #model_config = {"arbitrary_types_allowed": True}
+    model_config = {"arbitrary_types_allowed": True}
