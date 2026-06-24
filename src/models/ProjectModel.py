@@ -31,7 +31,6 @@ class ProjectModel(BaseDataModel):
     async def get_all_projects(self, page: int=1, page_size: int=10): ## get all but with pagination
 
         # count total number of documents
-
         total_documents = await self.collection.count_documents({}) # empty to count all
 
         # calculate total number of pages
