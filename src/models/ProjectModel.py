@@ -28,7 +28,7 @@ class ProjectModel(BaseDataModel):
         
         return Project(**record) # converts dict to model in the project
     
-    async def get_all_projects(self, page: int=1, page_size: int=10):
+    async def get_all_projects(self, page: int=1, page_size: int=10): ## get all but with pagination
 
         # count total number of documents
 
@@ -39,5 +39,11 @@ class ProjectModel(BaseDataModel):
         if total_documents % page_size > 0:
             total_pages +=1
 
-        self.collection.find().skip( (page-1) * page_size ).limit(page_size)
+        cursor = self.collection.find().skip( (page-1) * page_size ).limit(page_size)
+        projects = []
+        async for document in cursor: # async because cursor came from motor
+            projects.append(
+                projects(**document)
+                )
         
+        return projects, total_pages
