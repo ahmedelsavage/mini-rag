@@ -42,7 +42,7 @@ class ProjectModel(BaseDataModel):
         projects = []
         async for document in cursor: # async because cursor came from motor
             projects.append(
-                projects(**document)
+                Project(**document)
                 )
         
         return projects, total_pages
