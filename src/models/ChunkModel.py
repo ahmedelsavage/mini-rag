@@ -2,6 +2,7 @@ from .BaseDataModel import BaseDataModel
 from .db_schemes import DataChunk
 from .enums.DataBaseEnums import DataBaseEnums
 from bson.objectid import ObjectId
+from pymongo import InsertOne
 
 class ChunkModel(BaseDataModel):
     def __init__(self, db_client):
@@ -24,3 +25,6 @@ class ChunkModel(BaseDataModel):
             return None
         
         return DataChunk(**result)
+    
+    async def get_many_chunks()
+    
