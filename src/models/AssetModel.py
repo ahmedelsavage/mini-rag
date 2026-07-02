@@ -1,7 +1,7 @@
 from .BaseDataModel import BaseDataModel
 from .db_schemes import Asset
 from .enums.DataBaseEnums import DataBaseEnums
-from bson import ObjectID
+from bson import ObjectId
 
 class AssetModel(BaseDataModel):
     
@@ -30,13 +30,13 @@ class AssetModel(BaseDataModel):
     async def create_asset(self, asset: Asset):
 
         result = await self.collection.insert_one(asset.model_dump(by_alias=True, exclude_unset=True))
-        asset._id = result.inserted_id
+        asset.id = result.inserted_id
 
         return asset
     
     async def get_all_project_assets(self, asset_project_id: str):
 
         return await self.collection.find({
-            "asset_project_id": ObjectID(asset_project_id) if isinstance(asset_project_id, str) else asset_project_id
+            "asset_project_id": ObjectId(asset_project_id) if isinstance(asset_project_id, str) else asset_project_id
         }).to_list(length=None)
     
