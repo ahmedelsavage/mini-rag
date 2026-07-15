@@ -93,7 +93,6 @@ async def upload_data(request: Request, project_id: str, file: UploadFile,
 @data_router.post("/process/{project_id}")
 async def process_endpoint(request: Request, project_id: str, process_request: ProcessRequest):
 
-    file_id = process_request.file_id
     chunk_size = process_request.chunk_size
     overlap_size = process_request.overlap_size
     do_reset = process_request.do_reset
@@ -105,6 +104,32 @@ async def process_endpoint(request: Request, project_id: str, process_request: P
     project = await project_model.get_project_or_create_one(
         project_id=project_id
     )
+
+    project_files_ids = []
+    if process_request.file_id:
+        project_files_ids = [process_request.file_id]
+    else:
+        asset_model = await AssetModel.create_instance(
+        db_client= request.app.db_client    
+        )
+        
+        project_files = await asset_model.get_all_project_assets(
+            asset_project_id=project.id,
+            asset_type=AssetTypeEnum.FILE.value,
+        )
+
+        project_files_ids = [
+            record("asset_name")
+            for record in project_files
+        ]
+
+    if len(project_files_ids) == 0:
+        return JSONResponse(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            content={
+                "signal": ResponseSignal.NO_FILES_ERROR.value,
+            }
+        )
 
     process_controller = ProcessController(project_id=project_id)
 
