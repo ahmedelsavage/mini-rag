@@ -118,10 +118,10 @@ async def process_endpoint(request: Request, project_id: str, process_request: P
             asset_type=AssetTypeEnum.FILE.value,
         )
 
-        project_files_ids = [
-            record["asset_name"]
+        project_files_ids = {
+            record.id : record.asset_name
             for record in project_files
-        ]
+        }
 
     if len(project_files_ids) == 0:
         return JSONResponse(
@@ -171,6 +171,7 @@ async def process_endpoint(request: Request, project_id: str, process_request: P
                 chunk_metadata=chunk.metadata,
                 chunk_order=i+1,
                 chunk_project_id=project.id,
+                chunk_asset_id=
             )
             for i, chunk in enumerate(file_chunks)
         ]
