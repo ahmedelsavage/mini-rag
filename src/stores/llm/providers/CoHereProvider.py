@@ -46,12 +46,22 @@ class CoHereProvider(LLMInterface):
             self.logger.error("Generation model for CoHere was not set")
             return None
 
+         max_output_token = max_output_token if max_output_token else self.default_generation_max_output_tokens
+         temperature = temperature if temperature else self.default_generation_temerature
+         
          response = self.client.chat(
              model = self.generation_model_id,
              chat_history = chat_history,
              message = self.process_text(prompt),
-             
+             temperature = temperature,
+             max_tokens = max_output_token
          )
+
+         if not response or not response.text:
+            self.logger.error("Error while generation text with CoHere")
+            return None
+
+         return response.text
 
     def construct_prompt(self, prompt: str, role: str):
         return{
