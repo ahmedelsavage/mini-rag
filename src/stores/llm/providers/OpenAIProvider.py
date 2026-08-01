@@ -30,11 +30,10 @@ class OpenAIProvider(LLMInterface):
         self.logger = logging.getLogger(__name__)
 
     def set_generation_model(self, model_id: str):
-
         self.generation_model_id = model_id
 
     def set_embedding_model(self, model_id: str, embedding_size):
-        self.set_embedding_model = model_id
+        self.embedding_model_id = model_id
         self.embedding_size = embedding_size
 
     def process_text(self, text: str):
@@ -44,8 +43,8 @@ class OpenAIProvider(LLMInterface):
                             temperature: float = None):
         
         if not self.client:
-                    self.logger.error("OpenAI client was not set")
-                    return None
+            self.logger.error("OpenAI client was not set")
+            return None
 
         if not self.generation_model_id:
             self.logger.error("Generation model for OpenAI was not set")
@@ -81,7 +80,7 @@ class OpenAIProvider(LLMInterface):
             self.logger.error("Emdedding model for OpenAI was not set")
             return None
 
-        response = self.client.emdeddings.create(
+        response = self.client.embeddings.create(
             model = self.embedding_model_id,
             input = text,
         )
@@ -97,9 +96,4 @@ class OpenAIProvider(LLMInterface):
              "role":role,
              "content":self.process_text(prompt)
         }
-        
-            
-
-
-
-        
+          
