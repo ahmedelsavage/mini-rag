@@ -6,13 +6,12 @@ from stores.llm.LLMProviderFactory import LLMProviderFactory
 
 app = FastAPI()
 
-@app.on_event("startup")
 async def start_up_db_client():
     settings = get_settings()
     app.mongo_conn = AsyncIOMotorClient(settings.MONGODB_URL)
     app.db_client = app.mongo_conn[settings.MONGODB_DATABASE]
 
-    llm_provider_factory = llm_provider_factory(settings)
+    llm_provider_factory = LLMProviderFactory(settings)
 
     # generation client
     app.generation_client = llm_provider_factory.create(provider=settings.GENERATION_BACKEND)
@@ -20,11 +19,14 @@ async def start_up_db_client():
 
     #embedding client
     app.embedding_client = llm_provider_factory.create(provider=settings.EMBEDDING_BACKEND)
-    app.embedding_client.set_embedding_model(model_id = settings.EMBEDDING_MODEL_ID,)
+    app.embedding_client.set_embedding_model(model_id = settings.EMBEDDING_MODEL_ID,
+                                            embedding_size = settings.EMBEDDING_MODEL_SIZE)
     
-@app.on_event("shutdown")
 async def shutdown_db_client():
     app.mongo_conn.close()
+
+app.router.lifespan.on_startup.append(start_up_db_client)
+app.router.lifespan.on_shutdown.append(shutdown_db_client)
 
 app.include_router(base.base_router)
 app.include_router(data.data_router)
