@@ -4,9 +4,9 @@ from ..VectorDBEnums import DistanceMethodEnums
 import logging
 from typing import List
 
-class QdrantBD(VectorDBInterface):
+class QdrantDBProvider(VectorDBInterface):
 
-    def __init__(self, db_path: str, distance_method: str,):
+    def __init__(self, db_path: str, distance_method: str):
 
         self.client = None
         self.dbpath = db_path
@@ -66,26 +66,68 @@ class QdrantBD(VectorDBInterface):
             self.logger.error(f"Can not insert new record to non-existed collection {collection_name}")
             return False
 
-        _ =  self.client.upload_records(
-            collection_name=collection_name,
-            records=[
-                models.Record(
-                    vector=vector,
-                    payload={
-                        "text": text,"metadata": metadata
-                    }
-                )
-            ]
-        )
+        try:
+            _ =  self.client.upload_records(
+                collection_name=collection_name,
+                records=[
+                    models.Record(
+                        vector=vector,
+                        payload={
+                            "text": text,"metadata": metadata
+                        }
+                    )
+                ]
+            )
+        except Exception as e:
+            self.logger.error(f"Error while inserting batch: {e}")
+            return False
 
         return True
 
     def insert_many(self, collection_name: str, texts: List,
                              vectors: List, metadata: list = None,
                              record_ids: List = None, batch_size: int = 50):
-        
-        
-            
 
-            
+        if metadata is None:
+            metadata = [None] * len(texts)
 
+        if record_ids is None:
+            record_ids = [None] * len(texts)
+
+        for i in range(0, len(texts), batch_size):
+            batch_end = i + batch_size
+
+            batch_texts = texts[i:batch_end]
+            batch_vectors = vectors[i:batch_end]
+            batch_metadata = metadata[i:batch_end]
+
+            batch_records = [
+
+                models.Record(
+                    vector=batch_vectors[x],
+                    payload={
+                        "text": batch_texts[x],"metadata": batch_metadata[x]
+                    }
+                )
+
+                for x in range(len(batch_texts))
+            ]
+
+            try:
+                _ =  self.client.upload_records(
+                collection_name=collection_name,
+                records=batch_records,
+                )
+            except Exception as e:
+                self.logger.error(f"Error while inserting batch: {e}")
+                return False
+
+        return True
+
+    def search_by_vector(self, collection_name: str, vector: List, limit: int = 5):
+
+        return self.client.search(
+            collection_name=collection_name,
+            query_vector=vector,
+            limit=limit
+        )
