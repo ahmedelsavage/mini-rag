@@ -57,4 +57,3 @@ class NLPController(BaseController):
         )
 
         return True
-
