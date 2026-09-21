@@ -47,6 +47,7 @@ async def index_project(request: Request, project_id: str, push_request: PushReq
     has_records = True
     page_no = 1
     inserted_items_count = 0
+    idx = 0
 
     while has_records:
         page_chunks = await chunk_model.get_project_chunks(project_id=project.id, page_no=page_no)
@@ -57,10 +58,14 @@ async def index_project(request: Request, project_id: str, push_request: PushReq
             has_records = False
             break
 
+        chunks_ids = list(range(idx, idx+len(page_chunks)))
+        idx += len(page_chunks)
+
         is_inserted = nlp_controller.index_into_vector_db(
             project=project,
             chunks=page_chunks,
-            do_reset=push_request.do_reset
+            do_reset=push_request.do_reset,
+            chunks_ids=chunks_ids
         )
 
         if not is_inserted:
