@@ -68,14 +68,14 @@ class NLPController(BaseController):
         # step1: get collection name
         collection_name = self.create_collection_name(project_id=project.project_id)
 
-        #step2: get text embedding vector
+        # step2: get text embedding vector
         vector = self.embedding_client.embed_text(text=text, 
                                                 document_type=DocumentTypeEnum.QUERY.value)
 
         if not vector or len(vector) == 0:
             return False
 
-        #step3: do semantic search
+        # step3: do semantic search
         results = self.vectordb_client.search_by_vector(
             collection_name=collection_name,
             vector=vector,
@@ -86,3 +86,20 @@ class NLPController(BaseController):
             return False
 
         return results
+
+    def answer_rag_question(self, project: Project, query: str, limit: int = 10):
+
+        # step1: retrieve related documents
+        retrieved_documents = self.search_vector_db_collection(
+            project=project, 
+            text=query, 
+            limit=limit
+        )
+
+        if not retrieved_documents or len(retrieved_documents) == 0:
+            return None
+
+        # step2: construct LLM prompt
+        system_prompt = ""
+
+        
