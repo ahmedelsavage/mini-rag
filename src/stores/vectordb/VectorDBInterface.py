@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
+from models.db_schemes import RetrievedDocument
 
 class VectorDBInterface(ABC):
 
@@ -28,7 +29,7 @@ class VectorDBInterface(ABC):
         pass
 
     @abstractmethod
-    def create_collection(self, collection_name: str,
+    def create_collection(self, x: str,
                                 embedding_size: int,
                                 do_reset: bool = False):
         pass
@@ -46,5 +47,5 @@ class VectorDBInterface(ABC):
         pass
 
     @abstractmethod
-    def search_by_vector(self, collection_name: str, vector: List, limit: int):
+    def search_by_vector(self, collection_name: str, vector: List, limit: int) -> List[RetrievedDocument]:
         pass
